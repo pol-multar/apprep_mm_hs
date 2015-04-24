@@ -45,8 +45,8 @@ public class Client {
             int rep;
             // Loop until the user wants to quit
             while (!wannaQuit) {
-                System.out.print("1 - Tweeter\n" + "2 - Retweeter\n"
-                        + "3 - Quitter\n" + ">");
+                System.out.print("1 - Tweeter\n" + "2 - Retweeter\n" + "3 - S'abonner\n"
+                        + "4 - Quitter\n" + ">");
 
                 try {
                     rep = Integer.parseInt(br.readLine());
@@ -67,6 +67,12 @@ public class Client {
                         break;
                     // 3 - Quitter
                     case 3:
+                        System.out.print("S'abonner : #");
+                        String hashtag = "#"+br.readLine();
+                        // TODO
+                        break;
+                    // 4 - Quitter
+                    case 4:
                         wannaQuit = true;
                         break;
                     }
@@ -77,7 +83,7 @@ public class Client {
             System.out.println("*** A BIENTOT ! ***");
 
         } catch (NotBoundException | IOException e) {
-            e.printStackTrace();
+            System.out.println("Connexion impossible.");
         }
     }
 }

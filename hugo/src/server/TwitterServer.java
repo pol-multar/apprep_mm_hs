@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class TwitterServer extends UnicastRemoteObject implements TwitterRemote {
+    private static final long serialVersionUID = 1L;
     private static final int PORT = 2345;
 
     private ConcurrentMap<Integer, Tweet> tweets;
@@ -19,9 +20,8 @@ public class TwitterServer extends UnicastRemoteObject implements TwitterRemote 
         super();
         tweets = new ConcurrentHashMap<Integer, Tweet>();
         availableHashtags = new ArrayList<String>();
+        System.out.println("Serveur lancé !");
     }
-
-    private static final long serialVersionUID = 1L;
 
     @Override
     public boolean connect(String username, String pwd) {
