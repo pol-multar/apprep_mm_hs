@@ -36,8 +36,12 @@ public class App implements MessageListener
             ConnectionFactory factory = new ActiveMQConnectionFactory(brokerURL);
             connection = factory.createConnection();
             connection.start();
+            // Pour consommer, il faut simplement ouvrir une session
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            // et dire dans cette session quelle queue(s) et topic(s) on accèdera et dans quel mode
             Destination destination = session.createQueue("test");
+            System.out.println("Nom de la queue " + destination);
+            //MessageConsumer est typé en QueueReceiver puisque on a passé queue comme param.
             consumer = session.createConsumer(destination);
             consumer.setMessageListener(this);
         }
@@ -47,6 +51,7 @@ public class App implements MessageListener
             e.printStackTrace();
         }
     }
+
 
     public void onMessage(Message message)
     {

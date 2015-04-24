@@ -27,6 +27,7 @@ public class Producer
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Destination destination = session.createQueue(queueName);
         producer = session.createProducer(destination);
+
     }
 
     public void run() throws JMSException
