@@ -25,8 +25,8 @@ public class TwitterServer extends UnicastRemoteObject implements TwitterRemote 
 
     @Override
     public boolean connect(String username, String pwd) {
-        if ("username".equals(username) && "pwd".equals(pwd)) {
-            System.out.println("username s'est connecté");
+        if ("username".equals(username) && "pwd".equals(pwd)) { // TODO username/pwd database
+            System.out.println(username+" s'est connecté.");
             return true;
         }
         return false;

@@ -30,7 +30,7 @@ public class Tweet {
     
     @Override
     public String toString(){
-        return "[n°" + id + "] " + author + " a tweeté : " + message;
+        return "[nÂ°" + id + "] " + author + " a tweetÃ© : " + message;
     }
 
     // Getters & Setters

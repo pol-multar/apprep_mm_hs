@@ -67,9 +67,10 @@ public class Client {
                         break;
                     // 3 - Quitter
                     case 3:
+                        // TODO display the available subscriptions
                         System.out.print("S'abonner à : #");
                         String hashtag = "#"+br.readLine();
-                        // TODO
+                        // TODO subscribe
                         break;
                     // 4 - Quitter
                     case 4:
