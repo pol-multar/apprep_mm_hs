@@ -20,13 +20,13 @@ public class TwitterServer extends UnicastRemoteObject implements TwitterRemote 
         super();
         tweets = new ConcurrentHashMap<Integer, Tweet>();
         availableHashtags = new ArrayList<String>();
-        System.out.println("Serveur lancé !");
+        System.out.println("Serveur lancÃ© !");
     }
 
     @Override
     public boolean connect(String username, String pwd) {
         if ("username".equals(username) && "pwd".equals(pwd)) {
-            System.out.println("username s'est connecté");
+            System.out.println("username s'est connectÃ©");
             return true;
         }
         return false;
