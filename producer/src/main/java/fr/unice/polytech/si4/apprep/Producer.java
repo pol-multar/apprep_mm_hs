@@ -19,13 +19,14 @@ public class Producer
     private Session session;
     private MessageProducer producer;
 
-    public Producer(ConnectionFactory factory, String queueName) throws JMSException
+    public Producer(ConnectionFactory factory, String topicName) throws JMSException
     {
         this.factory = factory;
         connection = factory.createConnection();
         connection.start();
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        Destination destination = session.createQueue(queueName);
+        //Destination destination = session.createQueue(queueName);
+        Destination destination = session.createTopic(topicName);
         producer = session.createProducer(destination);
 
     }

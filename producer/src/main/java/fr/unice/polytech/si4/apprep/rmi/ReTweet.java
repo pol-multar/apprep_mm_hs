@@ -1,4 +1,4 @@
-package server;
+package fr.unice.polytech.si4.apprep.rmi;
 
 /**
  * The retweets

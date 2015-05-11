@@ -1,4 +1,4 @@
-package server;
+package fr.unice.polytech.si4.apprep.rmi;
 
 import java.util.ArrayList;
 import java.util.List;

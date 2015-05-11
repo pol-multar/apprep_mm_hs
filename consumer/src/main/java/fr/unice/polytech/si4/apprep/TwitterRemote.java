@@ -1,4 +1,4 @@
-package server;
+package fr.unice.polytech.si4.apprep;
 
 
 import java.rmi.Remote;
@@ -10,23 +10,23 @@ public interface TwitterRemote extends Remote{
      * @param username, the username
      * @param pwd, the password
      * @return true if connection allowed
-     * @throws java.rmi.RemoteException
+     * @throws RemoteException
      */
     public boolean connect(String username, String pwd) throws RemoteException;
-    
+
     /**
      * Posts a tweet on the server
      * @param username the name of the user
      * @param msg the message to post (includes the hashtags)
-     * @throws java.rmi.RemoteException
+     * @throws RemoteException
      */
     public void tweet(String username, String msg) throws RemoteException;
-    
+
     /**
      * Reposts a tweet that already exists
      * @param username the name of the user
      * @param id the id of the tweet
-     * @throws java.rmi.RemoteException
+     * @throws RemoteException
      */
     public void retweet(String username, int id) throws RemoteException;
 }
