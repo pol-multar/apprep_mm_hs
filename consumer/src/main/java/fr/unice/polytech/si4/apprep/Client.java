@@ -34,7 +34,7 @@ public class Client {
                 String pwd = br.readLine();
                 connected = twitterRemote.connect(username, pwd);
                 if (!connected) {
-                    System.out.println("La connexion a échoué...");
+                    System.out.println("La connexion a Ã©chouÃ©...");
                 }
             }
             System.out.println("*** CONNEXION REUSSIE ***\n"
@@ -57,7 +57,7 @@ public class Client {
                             break;
                         // 2 - Retweeter
                         case 2:
-                            System.out.print("Retweeter : n°");
+                            System.out.print("Retweeter : nÂ°");
                             try {
                                 twitterRemote.retweet(username, Integer.parseInt(br
                                         .readLine()));
@@ -67,7 +67,7 @@ public class Client {
                         // 3 - Quitter
                         case 3:
                             // TODO display the available subscriptions
-                            System.out.print("S'abonner à : #");
+                            System.out.print("S'abonner Ã  : #");
                             String hashtag = "#"+br.readLine();
                             // TODO subscribe
                             break;
@@ -80,7 +80,7 @@ public class Client {
                 }
             }
 
-            System.out.println("*** À BIENTÔT ! ***");
+            System.out.println("*** A BIENTOT ! ***");
 
         } catch (NotBoundException | IOException e) {
             System.out.println("Connexion impossible.");
