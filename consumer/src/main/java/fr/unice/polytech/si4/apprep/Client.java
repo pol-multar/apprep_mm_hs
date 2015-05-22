@@ -6,10 +6,17 @@ import java.io.InputStreamReader;
 import java.rmi.NotBoundException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.List;
+
+import javax.jms.Destination;
+import javax.jms.Message;
+import javax.jms.MessageListener;
 
 
-public class Client {
+public class Client implements MessageListener {
+    public static String brokerURL = "tcp://localhost:61616";
     private static final int PORT = 2345;
+    private List<Destination> allTopics;
 
     /**
      * The main of the client
@@ -84,6 +91,12 @@ public class Client {
 
         } catch (NotBoundException | IOException e) {
             System.out.println("Connexion impossible.");
+            e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onMessage(Message message) {
+        //TODO completer
     }
 }

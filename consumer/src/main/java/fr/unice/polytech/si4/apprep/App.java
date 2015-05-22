@@ -44,6 +44,7 @@ public class App implements MessageListener
             //MessageConsumer est typé en QueueReceiver puisque on a passé queue comme param.
             consumer = session.createConsumer(destination);
             consumer.setMessageListener(this);
+            //Chaque topic aura son objet consumer
         }
         catch (Exception e)
         {
