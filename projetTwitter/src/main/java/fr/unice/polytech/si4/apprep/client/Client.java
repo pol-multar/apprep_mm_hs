@@ -27,13 +27,7 @@ public class Client implements MessageListener {
     InitialContext context = null;
 
 
-
-    /**
-     * The main of the client
-     *
-     * @param args
-     */
-    public static void main(String[] args) {
+    public void mainLoop(){
         try {
             String username = "";
             boolean connected = false;
@@ -117,4 +111,16 @@ public class Client implements MessageListener {
             e.printStackTrace();
         }
     }
+
+    /**
+     * The main of the client
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+        Client client = new Client();
+        client.mainLoop();
+    }
+
+
 }
