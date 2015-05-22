@@ -21,57 +21,59 @@ public class TwitterServer extends UnicastRemoteObject implements TwitterRemote 
     private ConcurrentMap<Integer, Tweet> tweets;
     private List<String> availableHashtags;
     private ConcurrentMap<String,String> logins;
+
     //JMS Part
-    private Connection connect;
+private Connection connect = null;
     private Session sendSession = null;
     private MessageProducer sender = null;
-    InitialContext context = null;
-
+    private InitialContext context = null;
 
     protected TwitterServer() throws RemoteException {
         super();
         tweets = new ConcurrentHashMap<Integer, Tweet>();
         logins = new ConcurrentHashMap<String,String>();
         availableHashtags = new ArrayList<String>();
+        initialise();
         System.out.println("Serveur lancé !");
     }
 
-    private void configuration() throws JMSException {
+    private void initialise() {
+        //TODO a enlever
+        availableHashtags.add("test1");
+        availableHashtags.add("test2");
         try
-        {	// Create a connection
-            // Si le producteur et le consommateur étaient codés séparément, ils auraient eu ce même bout de code
-
+        {	//On initialise le système
             Hashtable properties = new Hashtable();
             properties.put(Context.INITIAL_CONTEXT_FACTORY,
                     "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
             properties.put(Context.PROVIDER_URL, "tcp://localhost:61616");
-
             context = new InitialContext(properties);
-
-            ConnectionFactory factory = (ConnectionFactory) context.lookup("ConnectionFactory");
+            javax.jms.ConnectionFactory factory = (ConnectionFactory) context.lookup("ConnectionFactory");
             connect = factory.createConnection();
-
-            this.configurerPublisher();
-            //connect.start(); // on peut activer la connection.
+            //On crée le topic contenant l'ensemble des Hashtags disponibles
+            this.createMasterTopic();
         } catch (javax.jms.JMSException jmse){
             jmse.printStackTrace();
         } catch (NamingException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        this.publier();
+        try {
+            this.sendAvailableHastags();
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void configurerPublisher() throws JMSException, NamingException{
-        // Dans ce programme, on decide que le producteur decouvre la queue (ce qui la crééra si le nom n'est pas encore utilisé)
-        // et y accedera au cours d'1 session
+    private void createMasterTopic() throws JMSException, NamingException{
+       //On crée le 1er topic qui contiendra tous les hashtags
         sendSession = connect.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
-        Topic topic = (Topic) context.lookup("dynamicTopics/topicExo2");
+        Topic topic = (Topic) context.lookup("allHashtags");
         sender = sendSession.createProducer(topic);
     }
 
-    private void publier() throws JMSException{
-        for (int i=1;i<=10;i++){
+    private void sendAvailableHastags() throws JMSException{
+        /*for (int i=1;i<=10;i++){
             //Fabriquer un message
             MapMessage mess = sendSession.createMapMessage();
             mess.setInt("num",i);
@@ -79,10 +81,16 @@ public class TwitterServer extends UnicastRemoteObject implements TwitterRemote 
             if (i%2==0)
                 mess.setStringProperty("typeMess","important");
             if (i==1) mess.setIntProperty("numMess",1);
-            //Poster ce message dans la queue
             sender.send(mess); // equivaut à publier dans le topic
+        }*/
+
+        for(String s : availableHashtags){
+            //On envoie la liste des Hashtags disponibles
+            MapMessage message = sendSession.createMapMessage();
+            message.setString("nom",s);
         }
     }
+
 
     @Override
     public boolean connect(String username, String pwd) {
@@ -135,12 +143,6 @@ public class TwitterServer extends UnicastRemoteObject implements TwitterRemote 
         } catch (RemoteException e) {
             e.printStackTrace();
             return;
-        }
-
-        try {
-            ts.configuration();
-        } catch (JMSException e) {
-            e.printStackTrace();
         }
     }
 }
