@@ -68,16 +68,16 @@ public class Client implements MessageListener {
                         // 1 - Tweeter
                         case 1:
                             System.out.print("Tweeter : ");
-                            //twitterRemote.tweet(username, br.readLine());
+                            twitterRemote.tweet(username, br.readLine());
                             break;
                         // 2 - Retweeter
                         case 2:
                             System.out.print("Retweeter : n°");
-                            /*try {
+                            try {
                                 twitterRemote.retweet(username, Integer.parseInt(br
                                         .readLine()));
                             } catch (NumberFormatException e) {
-                            }*/
+                            }
                             break;
                         // 3 - Quitter
                         case 3:
@@ -86,6 +86,7 @@ public class Client implements MessageListener {
                         // 4 - Quitter
                         case 4:
                             wannaQuit = true;
+                            twitterRemote.disconnect(username);
                             break;
                     }
                 } catch (NumberFormatException e) {

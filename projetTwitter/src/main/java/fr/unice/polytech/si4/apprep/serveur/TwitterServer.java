@@ -21,6 +21,7 @@ public class TwitterServer extends UnicastRemoteObject implements TwitterRemote 
     private ConcurrentMap<Integer, Tweet> tweets;
     private List<String> availableHashtags;
     private ConcurrentMap<String,String> logins;
+    private List<String> connectedUsers;
 
     //JMS Part
 private Connection connect = null;
@@ -33,6 +34,7 @@ private Connection connect = null;
         tweets = new ConcurrentHashMap<Integer, Tweet>();
         logins = new ConcurrentHashMap<String,String>();
         availableHashtags = new ArrayList<String>();
+        connectedUsers = new ArrayList<String>();
         //TODO seulement pour les tests
         availableHashtags.add("test1");
         availableHashtags.add("test2");
@@ -57,12 +59,12 @@ private Connection connect = null;
         } catch (NamingException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        }
-        try {//TODO modifier
+        }//TODO modifier
+/*        try {
             this.sendAvailableHastags();
         } catch (JMSException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     private void createInitialTopics() throws JMSException, NamingException{
@@ -101,10 +103,18 @@ private Connection connect = null;
     @Override
     public boolean connect(String username, String pwd) {
         if ("username".equals(username) && "pwd".equals(pwd)) { // TODO username/pwd database
+            connectedUsers.add(username);
             System.out.println(username+" s'est connecté.");
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void disconnect (String username) {
+        if(connectedUsers.contains(username)){
+            connectedUsers.remove(username);
+        }
     }
 
     @Override
@@ -137,12 +147,12 @@ private Connection connect = null;
     }
 
     @Override
-    public List<String> getAvailableHashtags() throws RemoteException{
+    public List<String> getAvailableHashtags(){
         return this.availableHashtags;
     }
 
     @Override
-    public void addNewHashtag(String hashtag) throws RemoteException{
+    public void addNewHashtag(String hashtag){
         if(!availableHashtags.contains(hashtag)) {
             this.availableHashtags.add(hashtag);
         }

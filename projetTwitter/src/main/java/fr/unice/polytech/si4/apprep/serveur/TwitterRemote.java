@@ -16,6 +16,13 @@ public interface TwitterRemote extends Remote{
     public boolean connect(String username, String pwd) throws RemoteException;
 
     /**
+     * Allow users to be disconnected
+     * @param username the username to be disconnected
+     * @throws RemoteException
+     */
+    public void disconnect(String username) throws RemoteException;
+
+    /**
      * Posts a tweet on the server
      * @param username the name of the user
      * @param msg the message to post (includes the hashtags)
