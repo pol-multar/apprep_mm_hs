@@ -114,7 +114,9 @@ private Connection connect = null;
 
     @Override
     public boolean connect(String username, String pwd) {
-        if ("username".equals(username) && "pwd".equals(pwd)) { // TODO username/pwd database
+        if (("user1".equals(username) && "pwd".equals(pwd))
+                || ("user2".equals(username) && "pwd".equals(pwd))
+                || ("user3".equals(username) && "pwd".equals(pwd))) {
             connectedUsers.add(username);
             System.out.println(username+" s'est connecté.");
             return true;
