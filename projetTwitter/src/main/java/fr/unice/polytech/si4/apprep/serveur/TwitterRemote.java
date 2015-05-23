@@ -21,7 +21,7 @@ public interface TwitterRemote extends Remote{
      * @param msg the message to post (includes the hashtags)
      * @throws RemoteException
      */
-    //public void tweet(String username, String msg) throws RemoteException;
+    public void tweet(String username, String msg) throws RemoteException;
 
     /**
      * Reposts a tweet that already exists
@@ -29,7 +29,7 @@ public interface TwitterRemote extends Remote{
      * @param id the id of the tweet
      * @throws RemoteException
      */
-    //public void retweet(String username, int id) throws RemoteException;
+    public void retweet(String username, int id) throws RemoteException;
 
     /**
      * Get the list of available hashtags

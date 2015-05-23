@@ -36,12 +36,11 @@ private Connection connect = null;
         //TODO seulement pour les tests
         availableHashtags.add("test1");
         availableHashtags.add("test2");
-        //initialise();
+        initialise();
         System.out.println("Serveur lancé !");
     }
 
     private void initialise() {
-        //TODO a enlever
         try
         {	//On initialise le système
             Hashtable properties = new Hashtable();
@@ -51,25 +50,31 @@ private Connection connect = null;
             context = new InitialContext(properties);
             javax.jms.ConnectionFactory factory = (ConnectionFactory) context.lookup("ConnectionFactory");
             connect = factory.createConnection();
-            //On crée le topic contenant l'ensemble des Hashtags disponibles
-            this.createMasterTopic();
+            //On crée les topics des hashtags existants
+            this.createInitialTopics();
         } catch (javax.jms.JMSException jmse){
             jmse.printStackTrace();
         } catch (NamingException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        try {
+        try {//TODO modifier
             this.sendAvailableHastags();
         } catch (JMSException e) {
             e.printStackTrace();
         }
     }
 
-    private void createMasterTopic() throws JMSException, NamingException{
-       //On crée le 1er topic qui contiendra tous les hashtags
+    private void createInitialTopics() throws JMSException, NamingException{
+       for(String s : availableHashtags){
+           createNewTopic(s);
+       }
+    }
+
+    private void createNewTopic(String hashtag)throws JMSException, NamingException{
+        //On crée le topic responsable du hashtag donné
         sendSession = connect.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
-        Topic topic = (Topic) context.lookup("allHashtags");
+        Topic topic = (Topic) context.lookup(hashtag);
         sender = sendSession.createProducer(topic);
     }
 
@@ -102,7 +107,7 @@ private Connection connect = null;
         return false;
     }
 
-    /*@Override
+    @Override
     public void tweet(String username, String msg) {
         Tweet t = new Tweet(tweets.size(), username, msg);
         tweets.put(t.getId(), t);
@@ -116,10 +121,9 @@ private Connection connect = null;
             }
         }
         System.out.print("\n");
-    }*/
+    }
 
-/*
-Ce n'est pas sur le serveur
+
     @Override
     public void retweet(String username, int id) {
         ReTweet t = new ReTweet(tweets.size(), username, tweets.get(id));
@@ -130,7 +134,7 @@ Ce n'est pas sur le serveur
             System.out.print(" "+hashtag);
         }
         System.out.print("\n");
-    }*/
+    }
 
     @Override
     public List<String> getAvailableHashtags() throws RemoteException{
