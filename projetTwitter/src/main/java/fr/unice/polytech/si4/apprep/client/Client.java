@@ -49,7 +49,7 @@ public class Client implements MessageListener {
             ConnectionFactory factory = (ConnectionFactory) context.lookup("ConnectionFactory");
             connect = factory.createConnection();
             for (String s : myHashtags) {
-                this.configurerSouscripteur(s);
+                this.subscribeTo(s);
             }
 
             //connect.start(); -> fait dans la methode au dessus
@@ -62,7 +62,7 @@ public class Client implements MessageListener {
         }
     }
 
-    private void configurerSouscripteur(String s) throws JMSException, NamingException {
+    private void subscribeTo(String s) throws JMSException, NamingException {
         // Pour consommer, il faudra simplement ouvrir une session
         receiveSession = connect.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
         // et dire dans cette session quelle queue(s) et topic(s) on accèdera et dans quel mode
@@ -82,6 +82,7 @@ public class Client implements MessageListener {
         new Runnable() {
             @Override
             public void run() {
+                System.out.println("Lancement du thread pour l'affichage des messages sur le hashtag "+topicName);
                 while (true) {
                     Message m = null;
                     try {
@@ -97,7 +98,7 @@ public class Client implements MessageListener {
         //}
     }
 
-    public void mainLoop() {
+    public void mainLoop() {//TODO tester avec plusieurs clients
         try {
             String username = "";
             boolean connected = false;
@@ -184,8 +185,13 @@ public class Client implements MessageListener {
             String response = br.readLine();
             myHashtags.add(response);
             subscribeTopic(response);// TODO subscribe
-            String hashtag = "#" + response;
+            //String hashtag = "#" + response;
+            subscribeTo(response);
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (NamingException e) {
+            e.printStackTrace();
+        } catch (JMSException e) {
             e.printStackTrace();
         }
 
