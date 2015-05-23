@@ -9,6 +9,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -22,16 +23,81 @@ public class Client implements MessageListener {
     public static String brokerURL = "tcp://localhost:61616";
     private static final int PORT = 2345;
     private List<Destination> allTopics;
-    TwitterRemote twitterRemote=null;
-    BufferedReader br=null;
+    TwitterRemote twitterRemote = null;
+    BufferedReader br = null;
     //List<String> availableHashtags=null;
+    List<String> myHashtags = null;
 
-    private Connection connect=null;
-    private Session receiveSession=null;
+    private Connection connect = null;
+    private Session receiveSession = null;
     InitialContext context = null;
 
+    public Client() {
+        myHashtags = new ArrayList<String>();
+    }
 
-    public void mainLoop(){
+    private void configuration() throws JMSException {
+        try {
+            // Create a connection
+            Hashtable properties = new Hashtable();
+            properties.put(Context.INITIAL_CONTEXT_FACTORY,
+                    "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
+            properties.put(Context.PROVIDER_URL, "tcp://localhost:61616");
+
+            context = new InitialContext(properties);
+
+            ConnectionFactory factory = (ConnectionFactory) context.lookup("ConnectionFactory");
+            connect = factory.createConnection();
+            for (String s : myHashtags) {
+                this.configurerSouscripteur(s);
+            }
+
+            //connect.start(); -> fait dans la methode au dessus
+
+        } catch (JMSException jmse) {
+            jmse.printStackTrace();
+        } catch (NamingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    private void configurerSouscripteur(String s) throws JMSException, NamingException {
+        // Pour consommer, il faudra simplement ouvrir une session
+        receiveSession = connect.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
+        // et dire dans cette session quelle queue(s) et topic(s) on accèdera et dans quel mode
+        Topic topic = (Topic) context.lookup(s);
+        System.out.println("Abonnement au hashtag #" + topic.getTopicName());
+        final String topicName = topic.getTopicName();
+        final MessageConsumer topicReceiver = receiveSession.createConsumer(topic);//,"Conso");//,"typeMess = 'important'");
+        //topicReceiver.setMessageListener(this);
+        //ESSAI d'une reception synchrone
+        connect.start(); // on peut activer la connection.
+        // while (true){
+        /*
+            Message m= topicReceiver.receive();
+            System.out.print("recept synch: ");
+            onMessage(m);*/
+
+        new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    Message m = null;
+                    try {
+                        m = topicReceiver.receive();
+                    } catch (JMSException e) {
+                        e.printStackTrace();
+                    }
+                    onMessage(m);
+                    System.out.println("#" + topicName);
+                }
+            }
+        };
+        //}
+    }
+
+    public void mainLoop() {
         try {
             String username = "";
             boolean connected = false;
@@ -104,7 +170,7 @@ public class Client implements MessageListener {
     /**
      * The method in charges of the subscribe procedure
      */
-    private void subscribeHashtag(){
+    private void subscribeHashtag() {
         System.out.print("Vous pouvez vous abonner à :");
         try {
             List<String> availableHashtags = twitterRemote.getAvailableHashtags();
@@ -115,20 +181,29 @@ public class Client implements MessageListener {
         //Waiting for response
         System.out.println("Entrez le hashtag auquel vous voulez souscrire (sans #)");
         try {
-            String hashtag = "#"+br.readLine();
+            String response = br.readLine();
+            myHashtags.add(response);
+            subscribeTopic(response);// TODO subscribe
+            String hashtag = "#" + response;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        // TODO subscribe
+
+    }
+
+    private void subscribeTopic(String hashtag) {
+
+
     }
 
     /**
      * Method in charge of displaying used Hashtags for the current user
+     *
      * @param hashtags the list of hashtags
      */
-    private void displayAvailableHashtags(List<String> hashtags){
-        for(String s : hashtags){
-            System.out.println("#"+s);
+    private void displayAvailableHashtags(List<String> hashtags) {
+        for (String s : hashtags) {
+            System.out.println("#" + s);
         }
     }
 
@@ -137,8 +212,8 @@ public class Client implements MessageListener {
         // Methode permettant au souscripteur de consommer effectivement chaque msg recu
         // via le topic auquel il a souscrit
         try {
-            System.out.print("Recu un message du topic: "+((MapMessage)message).getString("nom"));
-            System.out.println(((MapMessage)message).getString("num"));
+            System.out.print("Recu un message du topic: " + ((MapMessage) message).getString("nom"));
+            System.out.println(((MapMessage) message).getString("num"));
         } catch (JMSException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
