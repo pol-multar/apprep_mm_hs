@@ -33,14 +33,15 @@ private Connection connect = null;
         tweets = new ConcurrentHashMap<Integer, Tweet>();
         logins = new ConcurrentHashMap<String,String>();
         availableHashtags = new ArrayList<String>();
-        initialise();
+        //TODO seulement pour les tests
+        availableHashtags.add("test1");
+        availableHashtags.add("test2");
+        //initialise();
         System.out.println("Serveur lancé !");
     }
 
     private void initialise() {
         //TODO a enlever
-        availableHashtags.add("test1");
-        availableHashtags.add("test2");
         try
         {	//On initialise le système
             Hashtable properties = new Hashtable();
@@ -101,7 +102,7 @@ private Connection connect = null;
         return false;
     }
 
-    @Override
+    /*@Override
     public void tweet(String username, String msg) {
         Tweet t = new Tweet(tweets.size(), username, msg);
         tweets.put(t.getId(), t);
@@ -115,8 +116,10 @@ private Connection connect = null;
             }
         }
         System.out.print("\n");
-    }
+    }*/
 
+/*
+Ce n'est pas sur le serveur
     @Override
     public void retweet(String username, int id) {
         ReTweet t = new ReTweet(tweets.size(), username, tweets.get(id));
@@ -127,6 +130,11 @@ private Connection connect = null;
             System.out.print(" "+hashtag);
         }
         System.out.print("\n");
+    }*/
+
+    @Override
+    public List<String> getAvailableHashtags() throws RemoteException{
+        return this.availableHashtags;
     }
 
     /**

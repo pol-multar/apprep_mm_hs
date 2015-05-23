@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Hashtable;
@@ -21,6 +22,9 @@ public class Client implements MessageListener {
     public static String brokerURL = "tcp://localhost:61616";
     private static final int PORT = 2345;
     private List<Destination> allTopics;
+    TwitterRemote twitterRemote=null;
+    BufferedReader br=null;
+    //List<String> availableHashtags=null;
 
     private Connection connect=null;
     private Session receiveSession=null;
@@ -31,11 +35,11 @@ public class Client implements MessageListener {
         try {
             String username = "";
             boolean connected = false;
-            BufferedReader br = new BufferedReader(new InputStreamReader(
+            br = new BufferedReader(new InputStreamReader(
                     System.in));
             System.out.println("*** CONNEXION ***");
             Registry reg = LocateRegistry.getRegistry(2345);
-            TwitterRemote twitterRemote = (TwitterRemote) reg
+            twitterRemote = (TwitterRemote) reg
                     .lookup("rmi://localhost:" + PORT + "/TwitterServer");
             // Loop until the user is connected
             while (!connected) {
@@ -64,23 +68,20 @@ public class Client implements MessageListener {
                         // 1 - Tweeter
                         case 1:
                             System.out.print("Tweeter : ");
-                            twitterRemote.tweet(username, br.readLine());
+                            //twitterRemote.tweet(username, br.readLine());
                             break;
                         // 2 - Retweeter
                         case 2:
                             System.out.print("Retweeter : n°");
-                            try {
+                            /*try {
                                 twitterRemote.retweet(username, Integer.parseInt(br
                                         .readLine()));
                             } catch (NumberFormatException e) {
-                            }
+                            }*/
                             break;
                         // 3 - Quitter
                         case 3:
-                            // TODO display the available subscriptions
-                            System.out.print("S'abonner à : #");
-                            String hashtag = "#"+br.readLine();
-                            // TODO subscribe
+                            subscribeHashtag();
                             break;
                         // 4 - Quitter
                         case 4:
@@ -96,6 +97,37 @@ public class Client implements MessageListener {
         } catch (NotBoundException | IOException e) {
             System.out.println("Connexion impossible.");
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * The method in charges of the subscribe procedure
+     */
+    private void subscribeHashtag(){
+        System.out.print("S'abonner à : #");
+        try {
+            List<String> availableHashtags = twitterRemote.getAvailableHashtags();
+            displayAvailableHashtags(availableHashtags);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        //Waiting for response
+        System.out.println("Entrez le hashtag auquel vous voulez souscrire (sans #)");
+        try {
+            String hashtag = "#"+br.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // TODO subscribe
+    }
+
+    /**
+     * Method in charge of displaying used Hashtags for the current user
+     * @param hashtags the list of hashtags
+     */
+    private void displayAvailableHashtags(List<String> hashtags){
+        for(String s : hashtags){
+            System.out.println("#"+s);
         }
     }
 
