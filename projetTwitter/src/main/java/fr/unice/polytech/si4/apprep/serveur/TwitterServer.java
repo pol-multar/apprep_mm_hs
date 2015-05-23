@@ -135,8 +135,15 @@ private Connection connect = null;
         tweets.put(t.getId(), t);
         System.out.println(t);
         System.out.print("hashtags :");
+        try {//On diffuse le tweet
+            broadcastTweet(t);
+        } catch (NamingException e) {
+            e.printStackTrace();
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }
         for(String hashtag : t.getHashtags()){
-            System.out.print(" "+hashtag); //TODO diffuser le tweet
+            System.out.print(" "+hashtag);
             if(!availableHashtags.contains(hashtag)){
                 availableHashtags.add(hashtag);
                 try {
@@ -158,6 +165,13 @@ private Connection connect = null;
         ReTweet t = new ReTweet(tweets.size(), username, tweets.get(id));
         tweets.put(t.getId(), t);
         System.out.println(t);
+        try {
+            broadcastTweet(t);
+        } catch (NamingException e) {
+            e.printStackTrace();
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }
         System.out.print("hashtags :");
         for(String hashtag : t.getHashtags()){
             System.out.print(" "+hashtag);
