@@ -124,9 +124,16 @@ private Connection connect = null;
         System.out.println(t);
         System.out.print("hashtags :");
         for(String hashtag : t.getHashtags()){
-            System.out.print(" "+hashtag);
+            System.out.print(" "+hashtag); //TODO diffuser le tweet
             if(!availableHashtags.contains(hashtag)){
                 availableHashtags.add(hashtag);
+                try {
+                    createNewTopic(hashtag);
+                } catch (JMSException e) {
+                    e.printStackTrace();
+                } catch (NamingException e) {
+                    e.printStackTrace();
+                }
                 System.out.print(" (<--new!)");
             }
         }
