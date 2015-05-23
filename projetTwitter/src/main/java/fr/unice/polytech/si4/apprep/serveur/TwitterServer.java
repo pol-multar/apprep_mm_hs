@@ -52,6 +52,7 @@ private Connection connect = null;
             context = new InitialContext(properties);
             javax.jms.ConnectionFactory factory = (ConnectionFactory) context.lookup("ConnectionFactory");
             connect = factory.createConnection();
+            sendSession = connect.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
             //On crée les topics des hashtags existants
             this.createInitialTopics();
         } catch (javax.jms.JMSException jmse){
@@ -75,13 +76,12 @@ private Connection connect = null;
 
     private void createNewTopic(String hashtag)throws JMSException, NamingException{
         //On crée le topic responsable du hashtag donné
-        sendSession = connect.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
         Topic topic = (Topic) context.lookup(hashtag);
-        sender = sendSession.createProducer(topic);
+        sender = sendSession.createProducer(topic); //sender ne sera pas forcement utilise
     }
-
+/*
     private void sendAvailableHastags() throws JMSException{
-        /*for (int i=1;i<=10;i++){
+        for (int i=1;i<=10;i++){
             //Fabriquer un message
             MapMessage mess = sendSession.createMapMessage();
             mess.setInt("num",i);
@@ -90,12 +90,24 @@ private Connection connect = null;
                 mess.setStringProperty("typeMess","important");
             if (i==1) mess.setIntProperty("numMess",1);
             sender.send(mess); // equivaut à publier dans le topic
-        }*/
+        }
+    }*/
 
-        for(String s : availableHashtags){
-            //On envoie la liste des Hashtags disponibles
+    private void broadcastTweet(Tweet t) throws NamingException, JMSException {
+        //Je reccupere la liste des hastags
+        //pour chaque hastag, je diffuse le message
+
+        List<String> h = t.getHashtags();
+
+        for(String s : h){
+            Topic topic = (Topic) context.lookup(s);
+            sender = sendSession.createProducer(topic);
+            //On fabrique le message
             MapMessage message = sendSession.createMapMessage();
-            message.setString("nom",s);
+            message.setInt("Id",t.getId());
+            message.setString("Author",t.getAuthor());
+            message.setString("Contenu",t.getMessage());
+            sender.send(message);
         }
     }
 
