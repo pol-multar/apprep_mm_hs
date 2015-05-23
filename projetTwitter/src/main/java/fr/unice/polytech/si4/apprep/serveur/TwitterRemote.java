@@ -36,4 +36,6 @@ public interface TwitterRemote extends Remote{
      * @throws RemoteException
      */
     public List<String> getAvailableHashtags() throws RemoteException;
+
+    public void addNewHashtag(String hashtag) throws RemoteException;
 }

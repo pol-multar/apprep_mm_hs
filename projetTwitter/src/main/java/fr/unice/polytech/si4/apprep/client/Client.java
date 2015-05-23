@@ -104,7 +104,7 @@ public class Client implements MessageListener {
      * The method in charges of the subscribe procedure
      */
     private void subscribeHashtag(){
-        System.out.print("S'abonner à : #");
+        System.out.print("Vous pouvez vous abonner à :");
         try {
             List<String> availableHashtags = twitterRemote.getAvailableHashtags();
             displayAvailableHashtags(availableHashtags);

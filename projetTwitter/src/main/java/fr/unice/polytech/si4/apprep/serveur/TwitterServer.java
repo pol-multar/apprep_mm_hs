@@ -137,6 +137,13 @@ Ce n'est pas sur le serveur
         return this.availableHashtags;
     }
 
+    @Override
+    public void addNewHashtag(String hashtag) throws RemoteException{
+        if(!availableHashtags.contains(hashtag)) {
+            this.availableHashtags.add(hashtag);
+        }
+    }
+
     /**
      * the main of the server
      *
