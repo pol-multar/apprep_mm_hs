@@ -100,7 +100,7 @@ private Connection connect = null;
                 || ("user2".equals(username) && "pwd".equals(pwd))
                 || ("user3".equals(username) && "pwd".equals(pwd)))  {
             connectedUsers.add(username);
-            System.out.println(username+" s'est connecte.");
+            System.out.println(username+" s est connecte.");
             return true;
         }
         return false;

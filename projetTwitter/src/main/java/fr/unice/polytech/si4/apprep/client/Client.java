@@ -100,7 +100,7 @@ public class Client implements MessageListener {
                         e.printStackTrace();
                     }
                     onMessage(m);
-                    System.out.println("Reçu depuis l abonnement : #" + topicName);
+                    System.out.println("Recu depuis l abonnement : #" + topicName);
                 }
             }
         });

@@ -17,7 +17,7 @@ public class ReTweet extends Tweet {
 
     @Override
     public String toString(){
-        return "[n°" + id + "] " + author + " a retweeté  : " + message + " (source : "+authorSource+")";
+        return "[id=" + id + "] " + author + " a retweeté  : " + message + " (source : "+authorSource+")";
     }
 
     // Getters & Setters
