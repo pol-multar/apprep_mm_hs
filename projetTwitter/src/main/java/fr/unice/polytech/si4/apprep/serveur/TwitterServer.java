@@ -39,7 +39,7 @@ private Connection connect = null;
         availableHashtags.add("test1");
         availableHashtags.add("test2");
         initialise();
-        System.out.println("Serveur lanc� !");
+        System.out.println("Serveur lance !");
     }
 
     private void initialise() {
@@ -70,19 +70,6 @@ private Connection connect = null;
         Topic topic = (Topic) context.lookup("dynamicTopics/"+hashtag);
         sender = sendSession.createProducer(topic); //sender ne sera pas forcement utilise
     }
-/*
-    private void sendAvailableHastags() throws JMSException{
-        for (int i=1;i<=10;i++){
-            //Fabriquer un message
-            MapMessage mess = sendSession.createMapMessage();
-            mess.setInt("num",i);
-            mess.setString("nom",i+"-");
-            if (i%2==0)
-                mess.setStringProperty("typeMess","important");
-            if (i==1) mess.setIntProperty("numMess",1);
-            sender.send(mess); // equivaut a publier dans le topic
-        }
-    }*/
 
     private void broadcastTweet(Tweet t) throws NamingException, JMSException {
         //Je reccupere la liste des hastags
@@ -91,10 +78,6 @@ private Connection connect = null;
         List<String> h = t.getHashtags();
 
         for(String s : h){
-            /*
-            Topic topic = (Topic) context.lookup(s);
-            sender = sendSession.createProducer(topic);
-            */
             createNewTopic(s);
             //On fabrique le message
             MapMessage message = sendSession.createMapMessage();
@@ -109,11 +92,15 @@ private Connection connect = null;
 
     @Override
     public boolean connect(String username, String pwd) {
+        if(connectedUsers.contains(username)){
+            System.out.println(username+" est deja connecte");
+            return false;
+        }
         if (("user1".equals(username) && "pwd".equals(pwd))
                 || ("user2".equals(username) && "pwd".equals(pwd))
-                || ("user3".equals(username) && "pwd".equals(pwd))) {
+                || ("user3".equals(username) && "pwd".equals(pwd)))  {
             connectedUsers.add(username);
-            System.out.println(username+" s'est connecté.");
+            System.out.println(username+" s'est connecte.");
             return true;
         }
         return false;
@@ -141,11 +128,11 @@ private Connection connect = null;
         System.out.println(t);
         System.out.print("hashtags :");
         for(String hashtag : t.getHashtags()){
-            System.out.print(" "+hashtag);
+            System.out.print(" " + hashtag);
             if(!availableHashtags.contains(hashtag)){
-                availableHashtags.add(hashtag);
                 try {
                     createNewTopic(hashtag);
+                    availableHashtags.add(hashtag);
                 } catch (JMSException e) {
                     e.printStackTrace();
                 } catch (NamingException e) {
@@ -185,7 +172,16 @@ private Connection connect = null;
     @Override
     public void addNewHashtag(String hashtag){
         if(!availableHashtags.contains(hashtag)) {
-            this.availableHashtags.add(hashtag);
+            try {
+                //On cree le topic correspondant au hashtag
+                createNewTopic(hashtag);
+                //On l ajoute ensuite dans la liste des hashtags du serveur
+                this.availableHashtags.add(hashtag);
+            } catch (JMSException e) {
+                e.printStackTrace();
+            } catch (NamingException e) {
+                e.printStackTrace();
+            }
         }
     }
 

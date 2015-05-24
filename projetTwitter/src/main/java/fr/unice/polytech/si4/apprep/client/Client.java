@@ -78,24 +78,20 @@ public class Client implements MessageListener {
     private void subscribeTo(String s) throws JMSException, NamingException {
         // Pour consommer, il faudra simplement ouvrir une session
         receiveSession = connect.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
-        // et dire dans cette session quelle queue(s) et topic(s) on acc�dera et dans quel mode
+        // et dire dans cette session quelle queue(s) et topic(s) on accedera et dans quel mode
         Topic topic = (Topic) context.lookup("dynamicTopics/"+s);
         System.out.println("Abonnement au hashtag #" + topic.getTopicName());
         final String topicName = topic.getTopicName();
-        final MessageConsumer topicReceiver = receiveSession.createConsumer(topic);//,"Conso");//,"typeMess = 'important'");
-        //topicReceiver.setMessageListener(this);
-        //ESSAI d'une reception synchrone
-        connect.start(); // on peut activer la connection.
-        // while (true){
-        /*
-            Message m= topicReceiver.receive();
-            System.out.print("recept synch: ");
-            onMessage(m);*/
+        final MessageConsumer topicReceiver = receiveSession.createConsumer(topic);
 
+        connect.start(); // on peut activer la connection.
+
+        //On cree le thread charge de l affichage des tweets recus par jms
         Thread t = new Thread(new Runnable() {
+
             @Override
             public void run() {
-                System.out.println("Lancement du thread pour l'affichage des messages sur le hashtag "+topicName);
+                System.out.println("Vous etes maintenant abonne au hashtag "+topicName);
                 while (true) {
                     Message m = null;
                     try {
@@ -104,14 +100,14 @@ public class Client implements MessageListener {
                         e.printStackTrace();
                     }
                     onMessage(m);
-                    System.out.println("#" + topicName);
+                    System.out.println("Reçu depuis l abonnement : #" + topicName);
                 }
             }
         });
+        //On lance le thread cree
+        t.start();
 
-        t.start();//TODO verifier
 
-        //}
     }
 
     public void mainLoop() {//TODO tester avec plusieurs clients
@@ -132,7 +128,7 @@ public class Client implements MessageListener {
                 String pwd = br.readLine();
                 connected = twitterRemote.connect(username, pwd);
                 if (!connected) {
-                    System.out.println("La connexion a �chou�...");
+                    System.out.println("La connexion a echoue...");
                 }
             }
             System.out.println("*** CONNEXION REUSSIE ***\n"
@@ -204,12 +200,13 @@ public class Client implements MessageListener {
         try {
             String response = br.readLine();
             myHashtags.add(response);
-            if(twitterRemote.getAvailableHashtags().contains(response)) {
+            if(twitterRemote.getAvailableHashtags().contains(response)) {//Si le topic existe j y souscris directement
                 subscribeTo(response);
             }else{
-                //TODO creer le topic
+                System.out.println("Ce hastag n'a encore jamais ete utilise, creation du topic correspondant");
+                twitterRemote.addNewHashtag(response); //Sinon je la cree avant
+                subscribeTo(response);
             }
-            //String hashtag = "#" + response;
         } catch (IOException e) {
             e.printStackTrace();
         } catch (NamingException e) {
@@ -222,7 +219,6 @@ public class Client implements MessageListener {
 
     /**
      * Method in charge of displaying used Hashtags for the current user
-     *
      * @param hashtags the list of hashtags
      */
     private void displayAvailableHashtags(List<String> hashtags) {
@@ -232,14 +228,14 @@ public class Client implements MessageListener {
     }
 
     /**
-     * Methode permettant au souscripteur de consommer effectivement chaque msg recu
-     * via le topic auquel il a souscrit
+     * Methode permettant au souscripteur de consommer effectivement chaque tweet recu
+     * via le hashtag auquel il a souscrit
      * @param message
      */
     @Override
     public void onMessage(Message message) {
         try {
-            System.out.println("Recu un message du topic: " + ((MapMessage) message).getString("author"));
+            System.out.println("Recu un message de : " + ((MapMessage) message).getString("author"));
             System.out.println(((MapMessage) message).getString("contenu"));
         } catch (JMSException e) {
             // TODO Auto-generated catch block

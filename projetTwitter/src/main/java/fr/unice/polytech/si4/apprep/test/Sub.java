@@ -51,7 +51,7 @@ public class Sub implements javax.jms.MessageListener{
     private void configurerSouscripteur() throws JMSException, NamingException{
         // Pour consommer, il faudra simplement ouvrir une session
         receiveSession = connect.createSession(false,javax.jms.Session.AUTO_ACKNOWLEDGE);
-        // et dire dans cette session quelle queue(s) et topic(s) on accèdera et dans quel mode
+        // et dire dans cette session quelle queue(s) et topic(s) on accÃ¨dera et dans quel mode
         Topic topic = (Topic) context.lookup("dynamicTopics/topicExo2");
         System.out.println("Nom du topic " + topic.getTopicName());
         javax.jms.MessageConsumer topicReceiver = receiveSession.createConsumer(topic);//,"Conso");//,"typeMess = 'important'");
