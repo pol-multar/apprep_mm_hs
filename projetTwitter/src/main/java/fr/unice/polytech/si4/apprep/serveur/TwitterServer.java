@@ -39,12 +39,12 @@ private Connection connect = null;
         availableHashtags.add("test1");
         availableHashtags.add("test2");
         initialise();
-        System.out.println("Serveur lancé !");
+        System.out.println("Serveur lancï¿½ !");
     }
 
     private void initialise() {
         try
-        {	//On initialise le système
+        {	//On initialise le systï¿½me
             Hashtable properties = new Hashtable();
             properties.put(Context.INITIAL_CONTEXT_FACTORY,
                     "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
@@ -52,7 +52,7 @@ private Connection connect = null;
             context = new InitialContext(properties);
             javax.jms.ConnectionFactory factory = (ConnectionFactory) context.lookup("ConnectionFactory");
             connect = factory.createConnection();
-            //On crée les topics des hashtags existants
+            //On crï¿½e les topics des hashtags existants
             for(String s : availableHashtags){
                 createNewTopic(s);
             }
@@ -61,18 +61,13 @@ private Connection connect = null;
         } catch (NamingException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        }//TODO modifier
-/*        try {
-            this.sendAvailableHastags();
-        } catch (JMSException e) {
-            e.printStackTrace();
-        }*/
+        }
     }
 
     private void createNewTopic(String hashtag)throws JMSException, NamingException{
         sendSession = connect.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
-        //On crée le topic responsable du hashtag donné
-        Topic topic = (Topic) context.lookup(hashtag);
+        //On crï¿½e le topic responsable du hashtag donnï¿½
+        Topic topic = (Topic) context.lookup("dynamicTopics/"+hashtag);
         sender = sendSession.createProducer(topic); //sender ne sera pas forcement utilise
     }
 /*
@@ -85,7 +80,7 @@ private Connection connect = null;
             if (i%2==0)
                 mess.setStringProperty("typeMess","important");
             if (i==1) mess.setIntProperty("numMess",1);
-            sender.send(mess); // equivaut à publier dans le topic
+            sender.send(mess); // equivaut ï¿½ publier dans le topic
         }
     }*/
 
@@ -96,8 +91,11 @@ private Connection connect = null;
         List<String> h = t.getHashtags();
 
         for(String s : h){
+            /*
             Topic topic = (Topic) context.lookup(s);
             sender = sendSession.createProducer(topic);
+            */
+            createNewTopic(s);
             //On fabrique le message
             MapMessage message = sendSession.createMapMessage();
             message.setInt("id",t.getId());
@@ -115,7 +113,7 @@ private Connection connect = null;
                 || ("user2".equals(username) && "pwd".equals(pwd))
                 || ("user3".equals(username) && "pwd".equals(pwd))) {
             connectedUsers.add(username);
-            System.out.println(username+" s'est connecté.");
+            System.out.println(username+" s'est connectÃ©.");
             return true;
         }
         return false;
@@ -132,8 +130,6 @@ private Connection connect = null;
     public void tweet(String username, String msg) {
         Tweet t = new Tweet(tweets.size(), username, msg);
         tweets.put(t.getId(), t);
-        System.out.println(t);
-        System.out.print("hashtags :");
         try {//On diffuse le tweet
             broadcastTweet(t);
         } catch (NamingException e) {
@@ -141,6 +137,9 @@ private Connection connect = null;
         } catch (JMSException e) {
             e.printStackTrace();
         }
+        //On l'affiche sur le serveur
+        System.out.println(t);
+        System.out.print("hashtags :");
         for(String hashtag : t.getHashtags()){
             System.out.print(" "+hashtag);
             if(!availableHashtags.contains(hashtag)){

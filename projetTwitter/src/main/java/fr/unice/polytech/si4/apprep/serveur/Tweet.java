@@ -23,14 +23,15 @@ public class Tweet {
         String[] words = message.split(" ");
         for(String word : words){
             if(word.substring(0, 1).equals("#")){
-                hashtags.add(word);
+                String[] properHash= word.split("#");//#hastag
+                hashtags.add(properHash[1]);
             }
         }
     }
 
     @Override
     public String toString(){
-        return "[n°" + id + "] " + author + " a tweeté : " + message;
+        return "[nÂ°" + id + "] " + author + " a tweetÃ© : " + message;
     }
 
     // Getters & Setters

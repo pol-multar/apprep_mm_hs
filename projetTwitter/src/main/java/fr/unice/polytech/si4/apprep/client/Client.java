@@ -78,8 +78,8 @@ public class Client implements MessageListener {
     private void subscribeTo(String s) throws JMSException, NamingException {
         // Pour consommer, il faudra simplement ouvrir une session
         receiveSession = connect.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
-        // et dire dans cette session quelle queue(s) et topic(s) on accèdera et dans quel mode
-        Topic topic = (Topic) context.lookup(s);
+        // et dire dans cette session quelle queue(s) et topic(s) on accï¿½dera et dans quel mode
+        Topic topic = (Topic) context.lookup("dynamicTopics/"+s);
         System.out.println("Abonnement au hashtag #" + topic.getTopicName());
         final String topicName = topic.getTopicName();
         final MessageConsumer topicReceiver = receiveSession.createConsumer(topic);//,"Conso");//,"typeMess = 'important'");
@@ -129,7 +129,7 @@ public class Client implements MessageListener {
                 String pwd = br.readLine();
                 connected = twitterRemote.connect(username, pwd);
                 if (!connected) {
-                    System.out.println("La connexion a échoué...");
+                    System.out.println("La connexion a ï¿½chouï¿½...");
                 }
             }
             System.out.println("*** CONNEXION REUSSIE ***\n"
@@ -152,7 +152,7 @@ public class Client implements MessageListener {
                             break;
                         // 2 - Retweeter
                         case 2:
-                            System.out.print("Retweeter : n°");
+                            System.out.print("Retweeter : nï¿½");
                             try {
                                 twitterRemote.retweet(username, Integer.parseInt(br
                                         .readLine()));
@@ -174,6 +174,7 @@ public class Client implements MessageListener {
             }
 
             System.out.println("*** A BIENTOT ! ***");
+            System.exit(0);
 
         } catch (NotBoundException | IOException e) {
             System.out.println("Connexion impossible.");
@@ -188,7 +189,7 @@ public class Client implements MessageListener {
      * If it isn't, it calls the method to create it and then it subscribes on it
      */
     private void subscribeHashtag() {
-        System.out.println("Vous pouvez vous abonner à :");
+        System.out.println("Vous pouvez vous abonner ï¿½ :");
         try {
             List<String> availableHashtags = twitterRemote.getAvailableHashtags();
             displayAvailableHashtags(availableHashtags);
