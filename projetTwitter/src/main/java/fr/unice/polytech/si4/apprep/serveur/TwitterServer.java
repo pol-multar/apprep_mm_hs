@@ -44,7 +44,7 @@ private Connection connect = null;
 
     private void initialise() {
         try
-        {	//On initialise le syst�me
+        {	//On initialise le systeme
             Hashtable properties = new Hashtable();
             properties.put(Context.INITIAL_CONTEXT_FACTORY,
                     "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
@@ -52,7 +52,7 @@ private Connection connect = null;
             context = new InitialContext(properties);
             javax.jms.ConnectionFactory factory = (ConnectionFactory) context.lookup("ConnectionFactory");
             connect = factory.createConnection();
-            //On cr�e les topics des hashtags existants
+            //On cree les topics des hashtags existants
             for(String s : availableHashtags){
                 createNewTopic(s);
             }
@@ -66,7 +66,7 @@ private Connection connect = null;
 
     private void createNewTopic(String hashtag)throws JMSException, NamingException{
         sendSession = connect.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
-        //On cr�e le topic responsable du hashtag donn�
+        //On cree le topic responsable du hashtag donne
         Topic topic = (Topic) context.lookup("dynamicTopics/"+hashtag);
         sender = sendSession.createProducer(topic); //sender ne sera pas forcement utilise
     }
@@ -80,7 +80,7 @@ private Connection connect = null;
             if (i%2==0)
                 mess.setStringProperty("typeMess","important");
             if (i==1) mess.setIntProperty("numMess",1);
-            sender.send(mess); // equivaut � publier dans le topic
+            sender.send(mess); // equivaut a publier dans le topic
         }
     }*/
 

@@ -92,7 +92,7 @@ public class Client implements MessageListener {
             System.out.print("recept synch: ");
             onMessage(m);*/
 
-        new Runnable() {
+        Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 System.out.println("Lancement du thread pour l'affichage des messages sur le hashtag "+topicName);
@@ -107,7 +107,10 @@ public class Client implements MessageListener {
                     System.out.println("#" + topicName);
                 }
             }
-        };
+        });
+
+        t.start();//TODO verifier
+
         //}
     }
 
@@ -152,7 +155,7 @@ public class Client implements MessageListener {
                             break;
                         // 2 - Retweeter
                         case 2:
-                            System.out.print("Retweeter : n�");
+                            System.out.print("Retweeter : n°");
                             try {
                                 twitterRemote.retweet(username, Integer.parseInt(br
                                         .readLine()));
@@ -189,7 +192,7 @@ public class Client implements MessageListener {
      * If it isn't, it calls the method to create it and then it subscribes on it
      */
     private void subscribeHashtag() {
-        System.out.println("Vous pouvez vous abonner � :");
+        System.out.println("Vous pouvez vous abonner a :");
         try {
             List<String> availableHashtags = twitterRemote.getAvailableHashtags();
             displayAvailableHashtags(availableHashtags);
