@@ -53,7 +53,9 @@ private Connection connect = null;
             javax.jms.ConnectionFactory factory = (ConnectionFactory) context.lookup("ConnectionFactory");
             connect = factory.createConnection();
             //On crée les topics des hashtags existants
-            this.createInitialTopics();
+            for(String s : availableHashtags){
+                createNewTopic(s);
+            }
         } catch (javax.jms.JMSException jmse){
             jmse.printStackTrace();
         } catch (NamingException e) {
@@ -65,12 +67,6 @@ private Connection connect = null;
         } catch (JMSException e) {
             e.printStackTrace();
         }*/
-    }
-
-    private void createInitialTopics() throws JMSException, NamingException{
-       for(String s : availableHashtags){
-           createNewTopic(s);
-       }
     }
 
     private void createNewTopic(String hashtag)throws JMSException, NamingException{
@@ -95,7 +91,7 @@ private Connection connect = null;
 
     private void broadcastTweet(Tweet t) throws NamingException, JMSException {
         //Je reccupere la liste des hastags
-        //pour chaque hastag, je diffuse le message
+        //pour chaque hastag du tweet, je diffuse celui-ci
 
         List<String> h = t.getHashtags();
 
@@ -104,9 +100,10 @@ private Connection connect = null;
             sender = sendSession.createProducer(topic);
             //On fabrique le message
             MapMessage message = sendSession.createMapMessage();
-            message.setInt("Id",t.getId());
-            message.setString("Author",t.getAuthor());
-            message.setString("Contenu",t.getMessage());
+            message.setInt("id",t.getId());
+            message.setString("author",t.getAuthor());
+            message.setString("contenu",t.getMessage());
+            //On l'envoie
             sender.send(message);
         }
     }

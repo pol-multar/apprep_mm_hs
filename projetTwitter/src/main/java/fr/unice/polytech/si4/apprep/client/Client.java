@@ -22,10 +22,8 @@ import javax.naming.NamingException;
 public class Client implements MessageListener {
     public static String brokerURL = "tcp://localhost:61616";
     private static final int PORT = 2345;
-    private List<Destination> allTopics;
     TwitterRemote twitterRemote = null;
     BufferedReader br = null;
-    //List<String> availableHashtags=null;
     List<String> myHashtags = null;
 
     private Connection connect = null;
@@ -34,8 +32,17 @@ public class Client implements MessageListener {
 
     public Client() {
         myHashtags = new ArrayList<String>();
+        try {
+            configuration();
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }
     }
 
+    /**
+     * Method in charges of the configuration of the MS part of the client
+     * @throws JMSException
+     */
     private void configuration() throws JMSException {
         try {
             // Create a connection
@@ -62,6 +69,12 @@ public class Client implements MessageListener {
         }
     }
 
+    /**
+     * Method in charge of the subscription on a topic
+     * @param s the topic to subscribe
+     * @throws JMSException
+     * @throws NamingException
+     */
     private void subscribeTo(String s) throws JMSException, NamingException {
         // Pour consommer, il faudra simplement ouvrir une session
         receiveSession = connect.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
@@ -170,23 +183,29 @@ public class Client implements MessageListener {
 
     /**
      * The method in charges of the subscribe procedure
+     * It tests if the hashtag exists.
+     * If it is, it calls the method to subscribe on it
+     * If it isn't, it calls the method to create it and then it subscribes on it
      */
     private void subscribeHashtag() {
-        System.out.print("Vous pouvez vous abonner à :");
+        System.out.println("Vous pouvez vous abonner à :");
         try {
             List<String> availableHashtags = twitterRemote.getAvailableHashtags();
             displayAvailableHashtags(availableHashtags);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-        //Waiting for response
         System.out.println("Entrez le hashtag auquel vous voulez souscrire (sans #)");
+        //Waiting for response
         try {
             String response = br.readLine();
             myHashtags.add(response);
-            subscribeTopic(response);// TODO subscribe
+            if(twitterRemote.getAvailableHashtags().contains(response)) {
+                subscribeTo(response);
+            }else{
+                //TODO creer le topic
+            }
             //String hashtag = "#" + response;
-            subscribeTo(response);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (NamingException e) {
@@ -194,11 +213,6 @@ public class Client implements MessageListener {
         } catch (JMSException e) {
             e.printStackTrace();
         }
-
-    }
-
-    private void subscribeTopic(String hashtag) {
-
 
     }
 
@@ -213,13 +227,16 @@ public class Client implements MessageListener {
         }
     }
 
+    /**
+     * Methode permettant au souscripteur de consommer effectivement chaque msg recu
+     * via le topic auquel il a souscrit
+     * @param message
+     */
     @Override
     public void onMessage(Message message) {
-        // Methode permettant au souscripteur de consommer effectivement chaque msg recu
-        // via le topic auquel il a souscrit
         try {
-            System.out.print("Recu un message du topic: " + ((MapMessage) message).getString("nom"));
-            System.out.println(((MapMessage) message).getString("num"));
+            System.out.println("Recu un message du topic: " + ((MapMessage) message).getString("author"));
+            System.out.println(((MapMessage) message).getString("contenu"));
         } catch (JMSException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
